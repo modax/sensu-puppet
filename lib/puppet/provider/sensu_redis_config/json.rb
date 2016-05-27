@@ -16,6 +16,14 @@ Puppet::Type.type(:sensu_redis_config).provide(:json) do
   end
 
   def flush
+    # Clean nil valued properties, esp. sentinel related
+    # Related to https://github.com/sensu/sensu-puppet/issues/394.
+    self.class.resource_type.validproperties.each do |prop|
+      if resource.should(prop).nil?
+        conf['redis'].delete prop.to_s
+      end
+    end
+
     File.open(config_file, 'w') do |f|
       f.puts JSON.pretty_generate(conf)
     end
@@ -75,6 +83,14 @@ Puppet::Type.type(:sensu_redis_config).provide(:json) do
 
   def db=(value)
     conf['redis']['db'] = value.to_i
+  end
+
+  def sentinels
+    conf['redis']['sentinels'] || []
+  end
+
+  def sentinels=(value)
+    conf['redis']['sentinels'] = value
   end
 
   def auto_reconnect
