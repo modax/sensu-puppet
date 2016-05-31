@@ -35,6 +35,7 @@ class sensu::redis::config {
     db                 => $sensu::redis_db,
     auto_reconnect     => $sensu::redis_auto_reconnect,
     sentinels          => $has_sentinels ? { true => $sensu::redis_sentinels, false => undef },
+    master             => $has_sentinels ? { true => $sensu::redis_master,    false => undef },
   }
 
 }
